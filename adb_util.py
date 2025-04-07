@@ -1,6 +1,30 @@
 import subprocess
 import re
 import time
+import os
+
+LAST_IP_FILE = "last_ip.txt"
+
+
+def save_last_ip(ip):
+    with open(LAST_IP_FILE, "w") as f:
+        f.write(ip.strip())
+
+
+def load_last_ip():
+    if os.path.exists(LAST_IP_FILE):
+        with open(LAST_IP_FILE, "r") as f:
+            return f.read().strip()
+    return ""
+
+
+def connect_to_ip(ip):
+    ip = ip.strip()
+    result = run_cmd(f"adb connect {ip}:5555")
+    if "connected" in result or "already connected" in result:
+        save_last_ip(ip)
+        return f"✓ Berhasil connect ke {ip}:5555"
+    return f"X Gagal connect ke {ip}:5555\n{result}"
 
 
 def run_cmd(cmd):
